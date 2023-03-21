@@ -4,7 +4,7 @@
 The official PyTorch implementation of the paper [**"OReX: Object Reconstruction from Planar Cross-sections Using Neural Fields"**](https://arxiv.org/abs/2211.12886).
 
 [//]: # (![alt text]&#40;https://github.com/haimsaw/CrossSections/blob/Release/teaser.png?raw=true&#41;)
-![alt text](https://github.com/haimsaw/OReX/blob/master/teaser.png?raw=true)
+![alt text](https://github.com/haimsaw/OReX/blob/main/teaser.png?raw=true)
 
 
 
