@@ -39,7 +39,7 @@ def _dual_contouring(net_manager, meshing_resolution, label):
 
     mesh = dual_contour_3d(f, f_normal, ijk_to_xyz, *meshing_resolution_arr)
     mesh.to_tri()
-    mesh.save(path.join(output_path,f'{"checkpoints" if label != "last" else "" }', 'mesh_{label}_{meshing_resolution}.obj'))
+    mesh.save(path.join(output_path,f'{"checkpoints" if label != "last" else "" }', f'mesh_{label}_{meshing_resolution}.obj'))
 
     return mesh
 
