@@ -146,11 +146,28 @@ class Plane:
             edges = np.concatenate((edges, cc.edges_indices))
         return edges
 
+    def __isub__(self, point: np.array):
+        assert point.shape == (3,)
+        self.vertices -= point
+        self.plane_origin -= point
+
+        new_D = - np.dot(self.plane_params[:3], self.plane_origin)
+        self.plane_params = self.plane_params[:3] + (new_D,)
+
+    def __itruediv__(self, scale: float):
+        self.vertices /= scale
+        self.plane_origin /= scale
+
+        new_D = - np.dot(self.plane_params[:3], self.plane_origin)
+        self.plane_params = self.plane_params[:3] + (new_D,)
+
 class CSL:
     def __init__(self, model_name, plane_gen, n_labels):
         self.model_name = model_name
         self.n_labels = n_labels
         self.planes = plane_gen(self)
+        self.adjust_csl()
+
 
     def __len__(self):
         return sum((len(plane) for plane in self.planes))
@@ -186,6 +203,10 @@ class CSL:
             scene_edges = np.concatenate((scene_edges, plane.edges + plane_vert_start))
 
         return scene_edges, scene_verts
+    
+    @property
+    def scale_factor(self):
+        return np.max(np.absolute(self.all_vertices))
 
     def to_file(self, path):
         with open(path, 'w') as f:
@@ -218,3 +239,21 @@ class CSL:
                 f.write('{:.10f} {:.10f} {:.10f}\n'.format(*v))
             for e in edges:
                 f.write('{:d} {:d} 0 255 0\n'.format(*e))
+                
+    def adjust_csl(self):
+        self.centralize()
+        self.scale()
+
+    def centralize(self):
+        mean = np.mean(self.all_vertices, axis=0)
+        for plane in self.planes:
+            plane -= mean
+            
+    def scale(self):
+        scale_factor = self.scale_factor
+        if scale_factor < 1:
+            return
+        for plane in self.planes:
+            plane.vertices /= 1.1 * scale_factor
+            plane.plane_origin /= 1.1 * scale_factor
+            plane.plane_params = (*plane.normal, plane_d_from_origin(plane.plane_origin, plane.normal))
